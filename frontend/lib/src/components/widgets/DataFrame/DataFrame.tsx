@@ -51,6 +51,7 @@ import {
   Dataframe as DataframeProto,
   type streamlit,
 } from "@streamlit/protobuf"
+import { isNullOrEmptyString } from "@streamlit/utils"
 
 import { BackendOperationContext } from "~lib/components/core/BackendOperationContext"
 import {
@@ -690,7 +691,7 @@ function DataFrame({
    * selectionState is absent so a later identical value can apply.
    */
   useEffect(() => {
-    if (!element.selectionState) {
+    if (isNullOrEmptyString(element.selectionState)) {
       processedSelectionStateRef.current = null
       return
     }
@@ -1050,8 +1051,10 @@ function DataFrame({
   // Name the grid (not the toolbar wrapper) only when alt is non-blank.
   // role="region" (not "img") exposes the name without making Glide's
   // operable canvas presentational.
-  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- blank alt must not become an accessible name
-  const accessibleName = element.alt?.trim() || undefined
+  const trimmedAlt = element.alt?.trim()
+  const accessibleName = isNullOrEmptyString(trimmedAlt)
+    ? undefined
+    : trimmedAlt
 
   return (
     <StyledResizableContainer
@@ -1223,7 +1226,7 @@ function DataFrame({
         data-testid="stDataFrameResizable"
         ref={resizableRef}
         aria-label={accessibleName}
-        {...(accessibleName ? { role: "region" } : {})}
+        {...(accessibleName !== undefined ? { role: "region" } : {})}
         defaultSize={resizableSize}
         style={{
           border: `${gridTheme.tableBorderWidth}px solid ${gridTheme.glideTheme.borderColor}`,
@@ -1525,7 +1528,7 @@ function DataFrame({
         />
       </Resizable>
       <div className={DATAFRAME_PRINT_SLOT_CLASS} ref={printSlotRef} />
-      {tooltip?.content && (
+      {tooltip !== undefined && (
         <Tooltip
           top={tooltip.top}
           left={tooltip.left}

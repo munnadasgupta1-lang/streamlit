@@ -29,6 +29,7 @@ import ErrorBoundary from "~lib/components/shared/ErrorBoundary/ErrorBoundary"
 import { getElementId } from "~lib/util/utils"
 
 import type { ElementContainerConfig } from "./ElementContainerConfig"
+import { RetainedElementContext } from "./RetainedElementContext"
 import {
   PRINT_HIDDEN_CLASS,
   PRINT_HIDDEN_ELEMENT_TYPES,
@@ -78,6 +79,7 @@ export const ElementContainer = memo(function ElementContainer({
   children,
 }: ElementContainerProps): ReactElement {
   const { isFullScreen } = useContext(ViewStateContext)
+  const isRetained = useContext(RetainedElementContext)
 
   const elementType = node.element.type ?? ""
   const elementId = getElementId(node.element)
@@ -97,7 +99,9 @@ export const ElementContainer = memo(function ElementContainer({
         .join(" ")}
       data-testid="stElementContainer"
       data-stale={isStale}
+      data-retained={isRetained || undefined}
       isStale={isStale && !isFullScreen}
+      isRetained={isRetained}
       elementType={elementType}
       node={node}
       config={config}
